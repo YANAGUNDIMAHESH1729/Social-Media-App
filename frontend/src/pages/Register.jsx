@@ -12,11 +12,18 @@ export default function Register() {
     age: ""
   });
 
+  // Get backend URL from frontend environment variable
+  const API = import.meta.env.VITE_API_URL;
+
   const submit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:4002/api/register", form, {
-      withCredentials: true
-    });
+
+    await axios.post(
+      `${API}/api/register`,
+      form,
+      { withCredentials: true } // important for cookie
+    );
+
     navigate("/login");
   };
 
@@ -40,5 +47,3 @@ export default function Register() {
     </div>
   );
 }
-
-

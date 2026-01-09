@@ -16,16 +16,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+require('dotenv').config(); 
+
+
+const mongoURL = process.env.MONGO_URI;
+
 mongoose
-  .connect("mongodb://127.0.0.1:27017/judix")
+  .connect(mongoURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error(err));
+  .catch(err => console.error("MongoDB connection error:", err));
+
 
 
 // CORS 
+
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -200,9 +211,9 @@ app.delete("/api/post/:id", isLoggedIn, async (req, res) => {
 });
 
 
-
-app.listen(4002, () => {
-  console.log("Backend running on http://localhost:4002");
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Backend running on PORT ${PORT}`);
 });
 
 

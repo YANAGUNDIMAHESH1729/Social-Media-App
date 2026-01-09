@@ -8,9 +8,10 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
+  const API = import.meta.env.VITE_API_URL;
 
-  useEffect( () => {
-    axios.get("http://localhost:4002/api/profile", {
+  useEffect(() => {
+    axios.get(`${API}/api/profile`, {
       withCredentials: true
     })
     .then(res => setUser(res.data))
@@ -19,20 +20,27 @@ export default function Dashboard() {
 
   const createPost = async (e) => {
     e.preventDefault();
-    const res=await axios.post("http://localhost:4002/api/post",
+
+    const res = await axios.post(
+      `${API}/api/post`,
       { content },
       { withCredentials: true }
     );
-     setUser(prev => ({...prev, posts: [res.data, ...prev.posts]}));
 
-  // clear textarea
-      setContent("");
+    setUser(prev => ({
+      ...prev,
+      posts: [res.data, ...prev.posts]
+    }));
+
+    setContent("");
   };
 
   const toggleLike = async (id) => {
-    const res = await axios.post(`http://localhost:4002/api/like/${id}`, {}, {
-      withCredentials: true
-    });
+    const res = await axios.post(
+      `${API}/api/like/${id}`,
+      {},
+      { withCredentials: true }
+    );
 
     setUser(prev => ({
       ...prev,
@@ -43,24 +51,27 @@ export default function Dashboard() {
   };
 
   const deletePost = async (id) => {
-      if (!confirm("Are you sure you want to delete this post?")) return;
-  await axios.delete(`http://localhost:4002/api/post/${id}`, {
-    withCredentials: true
-  });
+    if (!confirm("Are you sure you want to delete this post?")) return;
 
-  setUser(prev => ({
-    ...prev,
-    posts: prev.posts.filter(p => p._id !== id)
-  }));
-};
+    await axios.delete(`${API}/api/post/${id}`, {
+      withCredentials: true
+    });
 
+    setUser(prev => ({
+      ...prev,
+      posts: prev.posts.filter(p => p._id !== id)
+    }));
+  };
 
   if (!user) return <p>Loading...</p>;
 
   return (
     <div className="bg-zinc-900 min-h-screen text-white p-10">
       <button
-        onClick={() => axios.get("http://localhost:4002/api/logout", { withCredentials: true }).then(() => navigate("/login"))}
+        onClick={() =>
+          axios.get(`${API}/api/logout`, { withCredentials: true })
+            .then(() => navigate("/login"))
+        }
         className="bg-red-500 px-3 py-2 rounded-md float-right cursor-pointer"
       >
         Logout
@@ -68,14 +79,14 @@ export default function Dashboard() {
 
       <div className="flex items-center gap-3 mt-10">
         <img
-          src={`http://localhost:4002/uploads/${user.profilepic}`}
+          src={`${API}/uploads/${user.profilepic}`}
           className="w-10 h-10 rounded-md"
         />
         <h3 className="text-3xl">Hello {user.name}</h3>
       </div>
 
       <textarea
-        className="border-2 border-zinc-700 bg-transparent p-3 mt-5 w-1/3  outline-none"
+        className="border-2 border-zinc-700 bg-transparent p-3 mt-5 w-1/3 outline-none"
         placeholder="what is going on"
         value={content}
         onChange={e => setContent(e.target.value)}
@@ -87,38 +98,43 @@ export default function Dashboard() {
       >
         Create Post
       </button>
+
       <input
-         type="text"
-         placeholder="Search posts..."
-         value={search}
-         onChange={(e) => setSearch(e.target.value)}
-         className="bg-zinc-800 border border-zinc-700 p-2 mt-4 rounded-md w-1/3 outline-none"
+        type="text"
+        placeholder="Search posts..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="bg-zinc-800 border border-zinc-700 p-2 mt-4 rounded-md w-1/3 outline-none"
       />
 
       <h3 className="mt-10 text-zinc-400">Your Posts</h3>
 
-    {user.posts
-    .filter(post =>
-    post.content.toLowerCase().includes(search.toLowerCase())
-    )
-    .map(post => (
-      <div>
-        <div key={post._id} className="border border-zinc-700 p-5 mt-4 w-1/3">
-          <p>{post.content}</p>
-          <small>{post.likes.length} likes</small>
-          <div className="flex gap-4 mt-2">
-            <button className="cursor-pointer" onClick={() => toggleLike(post._id)}>
-              {post.likes.includes(user._id) ? "Unlike" : "Like"}
+      {user.posts
+        .filter(post =>
+          post.content.toLowerCase().includes(search.toLowerCase())
+        )
+        .map(post => (
+          <div key={post._id}>
+            <div className="border border-zinc-700 p-5 mt-4 w-1/3">
+              <p>{post.content}</p>
+              <small>{post.likes.length} likes</small>
+              <div className="flex gap-4 mt-2">
+                <button className="cursor-pointer" onClick={() => toggleLike(post._id)}>
+                  {post.likes.includes(user._id) ? "Unlike" : "Like"}
+                </button>
+                <button className="cursor-pointer" onClick={() => navigate(`/edit/${post._id}`)}>
+                  Edit
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={() => deletePost(post._id)}
+              className="text-red-400 ml-100 cursor-pointer"
+            >
+              Delete
             </button>
-            <button className="cursor-pointer" onClick={() => navigate(`/edit/${post._id}`)}>Edit</button>
           </div>
-        </div>
-          <button onClick={() => deletePost(post._id)} className="text-red-400 ml-100 cursor-pointer">
-            Delete
-          </button>
-      </div>
-
-      ))}
+        ))}
     </div>
   );
 }

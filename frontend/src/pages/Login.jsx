@@ -7,12 +7,17 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Get backend URL from frontend environment variable
+  const API = import.meta.env.VITE_API_URL;
+
   const submit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:4002/api/login", {
-      email,
-      password
-    }, { withCredentials: true });
+
+    await axios.post(
+      `${API}/api/login`,
+      { email, password },
+      { withCredentials: true }  // important for cookie
+    );
 
     navigate("/dashboard");
   };
