@@ -7,11 +7,8 @@ export default function EditPost() {
   const [content, setContent] = useState("");
   const navigate = useNavigate();
 
-  const API = import.meta.env.VITE_API_URL;
-
   const update = async () => {
-    await axios.put(
-      `${API}/api/update/${id}`,
+    await axios.put(`http://localhost:4002/api/update/${id}`,
       { content },
       { withCredentials: true }
     );
