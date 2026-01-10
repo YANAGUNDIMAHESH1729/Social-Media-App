@@ -12,6 +12,7 @@ const postModel = require("./models/post");
 const upload = require("./config/multerconfig");
 
 
+require('dotenv').config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
