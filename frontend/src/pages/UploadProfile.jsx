@@ -5,7 +5,7 @@ export default function UploadProfile() {
     const formData = new FormData();
     formData.append("image", e.target.files[0]);
 
-    await axios.post("http://localhost:4002/api/upload", formData, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/upload`, formData, {
       withCredentials: true
     });
   };

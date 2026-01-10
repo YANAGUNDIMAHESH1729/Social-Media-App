@@ -10,7 +10,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect( () => {
-    axios.get("http://localhost:4002/api/profile", {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/profile`, {
       withCredentials: true
     })
     .then(res => setUser(res.data))
@@ -19,7 +19,7 @@ export default function Dashboard() {
 
   const createPost = async (e) => {
     e.preventDefault();
-    const res=await axios.post("http://localhost:4002/api/post",
+    const res=await axios.post(`${import.meta.env.VITE_API_URL}/api/post`,
       { content },
       { withCredentials: true }
     );
@@ -30,7 +30,7 @@ export default function Dashboard() {
   };
 
   const toggleLike = async (id) => {
-    const res = await axios.post(`http://localhost:4002/api/like/${id}`, {}, {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/like/${id}`, {}, {
       withCredentials: true
     });
 
@@ -44,7 +44,7 @@ export default function Dashboard() {
 
   const deletePost = async (id) => {
       if (!confirm("Are you sure you want to delete this post?")) return;
-  await axios.delete(`http://localhost:4002/api/post/${id}`, {
+  await axios.delete(`${import.meta.env.VITE_API_URL}/api/post/${id}`, {
     withCredentials: true
   });
 
@@ -60,7 +60,7 @@ export default function Dashboard() {
   return (
     <div className="bg-zinc-900 min-h-screen text-white p-10">
       <button
-        onClick={() => axios.get("http://localhost:4002/api/logout", { withCredentials: true }).then(() => navigate("/login"))}
+        onClick={() => axios.get(`${import.meta.env.VITE_API_URL}/api/logout`, { withCredentials: true }).then(() => navigate("/login"))}
         className="bg-red-500 px-3 py-2 rounded-md float-right cursor-pointer"
       >
         Logout
@@ -68,7 +68,7 @@ export default function Dashboard() {
 
       <div className="flex items-center gap-3 mt-10">
         <img
-          src={`http://localhost:4002/uploads/${user.profilepic}`}
+          src={`${import.meta.env.VITE_API_URL}/uploads/${user.profilepic}`}
           className="w-10 h-10 rounded-md"
         />
         <h3 className="text-3xl">Hello {user.name}</h3>

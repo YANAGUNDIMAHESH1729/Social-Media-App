@@ -14,7 +14,7 @@ export default function Register() {
 
   const submit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:4002/api/register", form, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/register`, form, {
       withCredentials: true
     });
     navigate("/login");

@@ -9,7 +9,7 @@ export default function Login() {
 
   const submit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:4002/api/login", {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/login`, {
       email,
       password
     }, { withCredentials: true });

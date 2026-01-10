@@ -8,7 +8,7 @@ export default function EditPost() {
   const navigate = useNavigate();
 
   const update = async () => {
-    await axios.put(`http://localhost:4002/api/update/${id}`,
+    await axios.put(`${import.meta.env.VITE_API_URL}/api/update/${id}`,
       { content },
       { withCredentials: true }
     );
