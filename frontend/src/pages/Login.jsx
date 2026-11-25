@@ -6,15 +6,18 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
-    await axios.post(`${import.meta.env.VITE_API_URL}/api/login`, {
-      email,
-      password
-    }, { withCredentials: true });
-
-    navigate("/dashboard");
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/login`, {
+        email, password
+      }, { withCredentials: true });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not log in. Please try again.");
+    }
   };
 
   return (
@@ -33,6 +36,7 @@ export default function Login() {
           onChange={e => setPassword(e.target.value)}
         />
         <button className="bg-blue-500 px-5 py-2 rounded-md cursor-pointer">Login</button>
+        {error && <p role="alert" className="text-red-400">{error}</p>}
       </form>
     </div>
   );

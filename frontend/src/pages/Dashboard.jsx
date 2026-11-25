@@ -6,6 +6,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [content, setContent] = useState("");
   const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -15,18 +16,20 @@ export default function Dashboard() {
     })
     .then(res => setUser(res.data))
     .catch(() => navigate("/login"));
-  }, []);
+  }, [navigate]);
 
   const createPost = async (e) => {
     e.preventDefault();
-    const res=await axios.post(`${import.meta.env.VITE_API_URL}/api/post`,
-      { content },
-      { withCredentials: true }
-    );
-     setUser(prev => ({...prev, posts: [res.data, ...prev.posts]}));
-
-  // clear textarea
+    if (!content.trim()) return setError("Write something before posting.");
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/post`,
+        { content }, { withCredentials: true });
+      setUser(prev => ({ ...prev, posts: [res.data, ...prev.posts] }));
       setContent("");
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not create your post.");
+    }
   };
 
   const toggleLike = async (id) => {
@@ -69,9 +72,11 @@ export default function Dashboard() {
       <div className="flex items-center gap-3 mt-10">
         <img
           src={`${import.meta.env.VITE_API_URL}/uploads/${user.profilepic}`}
+          alt="Profile"
           className="w-10 h-10 rounded-md"
         />
         <h3 className="text-3xl">Hello {user.name}</h3>
+        <button onClick={() => navigate("/upload")} className="text-blue-400 underline">Change photo</button>
       </div>
 
       <textarea
@@ -80,6 +85,7 @@ export default function Dashboard() {
         value={content}
         onChange={e => setContent(e.target.value)}
       />
+      {error && <p role="alert" className="text-red-400 mt-2">{error}</p>}
 
       <button
         onClick={createPost}
@@ -102,13 +108,13 @@ export default function Dashboard() {
     post.content.toLowerCase().includes(search.toLowerCase())
     )
     .map(post => (
-      <div>
-        <div key={post._id} className="border border-zinc-700 p-5 mt-4 w-1/3">
+      <div key={post._id}>
+        <div className="border border-zinc-700 p-5 mt-4 w-1/3">
           <p>{post.content}</p>
           <small>{post.likes.length} likes</small>
           <div className="flex gap-4 mt-2">
             <button className="cursor-pointer" onClick={() => toggleLike(post._id)}>
-              {post.likes.includes(user._id) ? "Unlike" : "Like"}
+              {post.likes.some(like => (typeof like === "string" ? like : like._id) === user._id) ? "Unlike" : "Like"}
             </button>
             <button className="cursor-pointer" onClick={() => navigate(`/edit/${post._id}`)}>Edit</button>
           </div>

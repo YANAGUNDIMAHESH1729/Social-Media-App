@@ -11,13 +11,18 @@ export default function Register() {
     password: "",
     age: ""
   });
+  const [error, setError] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
-    await axios.post(`${import.meta.env.VITE_API_URL}/api/register`, form, {
-      withCredentials: true
-    });
-    navigate("/login");
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/register`, form, {
+        withCredentials: true
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not create your account.");
+    }
   };
 
   return (
@@ -28,7 +33,10 @@ export default function Register() {
           <input
             key={key}
             placeholder={key}
-            type={key === "password" ? "password" : "text"}
+            type={key === "password" ? "password" : key === "email" ? "email" : key === "age" ? "number" : "text"}
+            required
+            min={key === "age" ? 1 : undefined}
+            value={form[key]}
             className="px-3 py-2 bg-transparent border-2 border-zinc-700 rounded-md block outline-none"
             onChange={e => setForm({ ...form, [key]: e.target.value })}
           />
@@ -36,6 +44,7 @@ export default function Register() {
         <button className="bg-blue-500 px-5 py-2 rounded-md cursor-pointer">
           Create Account
         </button>
+        {error && <p role="alert" className="text-red-400">{error}</p>}
       </form>
     </div>
   );
